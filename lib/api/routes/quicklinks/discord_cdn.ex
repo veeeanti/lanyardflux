@@ -1,10 +1,10 @@
-defmodule Lanyard.Api.Quicklinks.DiscordCdn do
+defmodule Lanyard.Api.Quicklinks.FluxerCdn do
   alias Lanyard.Api.Util
 
   import Plug.Conn
   import Bitwise
 
-  @discord_cdn "https://cdn.discordapp.com"
+  @fluxer_cdn "https://fluxerusercontent.com"
 
   def proxy_image(conn) do
     [user_id, file_type] =
@@ -20,8 +20,8 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
         {:ok, %Finch.Response{body: b, headers: h, status: status_code}} =
           get_proxied_avatar(
             user_id,
-            p.discord_user["avatar"],
-            p.discord_user["discriminator"],
+            p.fluxer_user["avatar"],
+            p.fluxer_user["discriminator"],
             file_type
           )
 
@@ -43,7 +43,7 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
         file_type
       end
 
-    constructed_cdn_url = "#{@discord_cdn}/avatars/#{id}/#{avatar}.#{file_type}?size=1024"
+    constructed_cdn_url = "#{@fluxer_cdn}/avatars/#{id}/#{avatar}.#{file_type}?size=1024"
 
     :get
     |> Finch.build(constructed_cdn_url)
@@ -54,7 +54,7 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
     mod = Integer.mod(String.to_integer(id) >>> 22, 6)
 
     :get
-    |> Finch.build("#{@discord_cdn}/embed/avatars/#{mod}.png")
+    |> Finch.build("#{@fluxer_cdn}/embed/avatars/#{mod}.png")
     |> Finch.request(Lanyard.Finch)
   end
 
@@ -62,7 +62,7 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
     mod = Integer.mod(String.to_integer(discriminator), 5)
 
     :get
-    |> Finch.build("#{@discord_cdn}/embed/avatars/#{mod}.png")
+    |> Finch.build("#{@fluxer_cdn}/embed/avatars/#{mod}.png")
     |> Finch.request(Lanyard.Finch)
   end
 end

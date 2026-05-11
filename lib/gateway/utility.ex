@@ -4,7 +4,7 @@ defmodule Lanyard.Gateway.Utility do
     atom |> Atom.to_string() |> String.downcase() |> String.to_atom()
   end
 
-  @doc "Build a binary payload for discord communication"
+  @doc "Build a binary payload for fluxer communication"
   @spec payload_build(number, map, number, String.t()) :: binary
   def payload_build(op, data, seq_num \\ nil, event_name \\ nil) do
     load = %{"op" => op, "d" => data}
@@ -15,7 +15,7 @@ defmodule Lanyard.Gateway.Utility do
     |> :erlang.term_to_binary()
   end
 
-  @doc "Build a json  payload for discord communication"
+  @doc "Build a json  payload for fluxer communication"
   @spec payload_build_json(number, map, number, String.t()) :: binary
   def payload_build_json(op, data, seq_num \\ nil, event_name \\ nil) do
     load = %{"op" => op, "d" => data}
@@ -26,7 +26,7 @@ defmodule Lanyard.Gateway.Utility do
     |> Jason.encode!()
   end
 
-  @doc "Decode binary payload received from discord into a map"
+  @doc "Decode binary payload received from fluxer into a map"
   @spec payload_decode(list(), {:binary, binary()}) :: map
   def payload_decode(codes, {:binary, payload}) do
     payload = :erlang.binary_to_term(payload)
@@ -39,7 +39,7 @@ defmodule Lanyard.Gateway.Utility do
     }
   end
 
-  @doc "Decode json payload received from discord into a map"
+  @doc "Decode json payload received from fluxer into a map"
   @spec payload_decode(list(), {:text, binary()}) :: map
   def payload_decode(codes, {:text, payload}) do
     payload = Jason.decode!(payload)

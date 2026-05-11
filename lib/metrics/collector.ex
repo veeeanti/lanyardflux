@@ -61,10 +61,10 @@ defmodule Lanyard.Metrics.Collector do
     )
 
     Counter.new(
-      name: :lanyard_discord_messages_sent,
+      name: :lanyard_fluxer_messages_sent,
       registry: @registry,
       labels: [],
-      help: "Messages sent to discord count"
+      help: "Messages sent to fluxer count"
     )
   end
 

@@ -1,8 +1,8 @@
-defmodule Lanyard.DiscordBot.DiscordApi do
-  @api_host "https://discord.com/api/v9"
+defmodule Lanyard.FluxerBot.FluxerApi do
+  @api_host "https://web.fluxer.app/api"
 
   def send_message(channel_id, content) when is_binary(content) do
-    Lanyard.Metrics.Collector.inc(:counter, :lanyard_discord_messages_sent)
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_fluxer_messages_sent)
 
     sanitized_content =
       content

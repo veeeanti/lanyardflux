@@ -1,5 +1,5 @@
-defmodule Lanyard.DiscordBot.Commands.KV do
-  alias Lanyard.DiscordBot.DiscordApi
+defmodule Lanyard.FluxerBot.Commands.KV do
+  alias Lanyard.FluxerBot.FluxerApi
 
   def handle(_, payload) do
     kv =
@@ -9,7 +9,7 @@ defmodule Lanyard.DiscordBot.Commands.KV do
 
     kv = if String.length(kv) > 0, do: kv, else: "No keys"
 
-    DiscordApi.send_message(
+    FluxerApi.send_message(
       payload["channel_id"],
       "*`#{Application.get_env(:lanyard, :command_prefix)}get <key>` to get a value*\n*`#{Application.get_env(:lanyard, :command_prefix)}del <key>` to delete an existing key*\n*`#{Application.get_env(:lanyard, :command_prefix)}set <key> <value>` to set a key*\n\n**Keys:** ```#{kv}```"
     )

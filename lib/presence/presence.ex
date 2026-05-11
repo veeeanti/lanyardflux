@@ -1,17 +1,17 @@
 defmodule Lanyard.Presence.PublicFields do
   @derive Jason.Encoder
-  defstruct [:user_id, :discord_user, :discord_presence, :kv]
+  defstruct [:user_id, :fluxer_user, :fluxer_presence, :kv]
 end
 
 defmodule Lanyard.Presence.PrettyPresence do
   @derive Jason.Encoder
-  defstruct discord_user: %{},
-            discord_status: "offline",
-            active_on_discord_web: false,
-            active_on_discord_desktop: false,
-            active_on_discord_mobile: false,
-            active_on_discord_embedded: false,
-            active_on_discord_vr: false,
+  defstruct fluxer_user: %{},
+            fluxer_status: "offline",
+            active_on_fluxer_web: false,
+            active_on_fluxer_desktop: false,
+            active_on_fluxer_mobile: false,
+            active_on_fluxer_embedded: false,
+            active_on_fluxer_vr: false,
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
@@ -27,8 +27,8 @@ defmodule Lanyard.Presence do
 
   @derive Jason.Encoder
   defstruct user_id: nil,
-            discord_user: nil,
-            discord_presence: nil,
+            fluxer_user: nil,
+            fluxer_presence: nil,
             kv: nil,
             subscriber_pids: nil,
             refmap: nil
@@ -56,8 +56,8 @@ defmodule Lanyard.Presence do
     {:ok,
      %__MODULE__{
        user_id: state.user_id,
-       discord_presence: state.discord_presence,
-       discord_user: state.discord_user,
+       fluxer_presence: state.fluxer_presence,
+       fluxer_user: state.fluxer_user,
        kv: kv,
        subscriber_pids: subscriber_pids,
        refmap: %{}
@@ -117,8 +117,8 @@ defmodule Lanyard.Presence do
     {_, pretty_presence} =
       get_public_fields(
         %{
-          discord_user: state.discord_user,
-          discord_presence: state.discord_presence,
+          fluxer_user: state.fluxer_user,
+          fluxer_presence: state.fluxer_presence,
           user_id: state.user_id,
           kv: state.kv
         }
@@ -138,8 +138,8 @@ defmodule Lanyard.Presence do
   defp get_public_fields(state) do
     %Lanyard.Presence.PublicFields{
       user_id: state.user_id,
-      discord_user: state.discord_user,
-      discord_presence: state.discord_presence,
+      fluxer_user: state.fluxer_user,
+      fluxer_presence: state.fluxer_presence,
       kv: state.kv
     }
   end
@@ -188,42 +188,42 @@ defmodule Lanyard.Presence do
   end
 
   def build_pretty_presence(raw_data) do
-    activities = raw_data.discord_presence["activities"] || []
+    activities = raw_data.fluxer_presence["activities"] || []
 
     spotify_activity =
       activities
       |> Enum.find(fn activity ->
-        activity["id"] == Application.get_env(:lanyard, :discord_spotify_activity_id)
+        activity["id"] == Application.get_env(:lanyard, :fluxer_spotify_activity_id)
       end)
 
-    has_presence? = raw_data.discord_presence !== nil
+    has_presence? = raw_data.fluxer_presence !== nil
 
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
-          discord_user: raw_data.discord_user,
-          discord_status: raw_data.discord_presence["status"],
-          active_on_discord_web: Map.has_key?(raw_data.discord_presence["client_status"], "web"),
-          active_on_discord_desktop:
-            Map.has_key?(raw_data.discord_presence["client_status"], "desktop"),
-          active_on_discord_mobile:
-            Map.has_key?(raw_data.discord_presence["client_status"], "mobile"),
-          active_on_discord_embedded:
-            Map.has_key?(raw_data.discord_presence["client_status"], "embedded"),
-          active_on_discord_vr: Map.has_key?(raw_data.discord_presence["client_status"], "vr"),
+          fluxer_user: raw_data.fluxer_user,
+          fluxer_status: raw_data.fluxer_presence["status"],
+          active_on_fluxer_web: Map.has_key?(raw_data.fluxer_presence["client_status"], "web"),
+          active_on_fluxer_desktop:
+            Map.has_key?(raw_data.fluxer_presence["client_status"], "desktop"),
+          active_on_fluxer_mobile:
+            Map.has_key?(raw_data.fluxer_presence["client_status"], "mobile"),
+          active_on_fluxer_embedded:
+            Map.has_key?(raw_data.fluxer_presence["client_status"], "embedded"),
+          active_on_fluxer_vr: Map.has_key?(raw_data.fluxer_presence["client_status"], "vr"),
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
-          activities: Activity.build_pretty_activities(raw_data.discord_presence["activities"]),
+          activities: Activity.build_pretty_activities(raw_data.fluxer_presence["activities"]),
           kv: raw_data.kv
         }
       else
         %Lanyard.Presence.PrettyPresence{
-          discord_user: raw_data.discord_user,
+          fluxer_user: raw_data.fluxer_user,
           kv: raw_data.kv
         }
       end
 
-    :ets.insert(:cached_presences, {"#{raw_data.discord_user["id"]}", pretty_fields})
+    :ets.insert(:cached_presences, {"#{raw_data.fluxer_user["id"]}", pretty_fields})
 
     {:ok, pretty_fields}
   end

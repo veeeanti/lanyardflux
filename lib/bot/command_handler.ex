@@ -1,11 +1,11 @@
-defmodule Lanyard.DiscordBot.CommandHandler do
+defmodule Lanyard.FluxerBot.CommandHandler do
   @command_map %{
-    "get" => Lanyard.DiscordBot.Commands.Get,
-    "set" => Lanyard.DiscordBot.Commands.Set,
-    "del" => Lanyard.DiscordBot.Commands.Del,
-    "apikey" => Lanyard.DiscordBot.Commands.ApiKey,
-    "kv" => Lanyard.DiscordBot.Commands.KV,
-    "help" => Lanyard.DiscordBot.Commands.KV
+    "get" => Lanyard.FluxerBot.Commands.Get,
+    "set" => Lanyard.FluxerBot.Commands.Set,
+    "del" => Lanyard.FluxerBot.Commands.Del,
+    "apikey" => Lanyard.FluxerBot.Commands.ApiKey,
+    "kv" => Lanyard.FluxerBot.Commands.KV,
+    "help" => Lanyard.FluxerBot.Commands.KV
   }
 
   def handle_message(payload) do

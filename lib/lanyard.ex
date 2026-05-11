@@ -13,7 +13,7 @@ defmodule Lanyard do
       {GenRegistry, worker_module: Lanyard.Presence},
       {Lanyard.Metrics, :normal},
       {Lanyard.Connectivity.Redis, []},
-      {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
+      {Lanyard.FluxerBot, %{token: Application.get_env(:lanyard, :bot_token)}},
       {Bandit,
        plug: Lanyard.Api.Router, scheme: :http, port: Application.get_env(:lanyard, :http_port)}
     ]

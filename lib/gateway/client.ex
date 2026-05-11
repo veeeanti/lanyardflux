@@ -1,5 +1,5 @@
 defmodule Lanyard.Gateway.Client do
-  # a lot of functionality here is taken from: https://github.com/rmcafee/discord_ex/blob/master/lib/discord_ex/client/client.ex
+  # a lot of functionality here is taken from: https://github.com/rmcafee/fluxer_ex/blob/master/lib/fluxer_ex/client/client.ex
   require Logger
 
   alias Lanyard.Gateway.Heartbeat
@@ -42,7 +42,7 @@ defmodule Lanyard.Gateway.Client do
 
     url =
       case state[:resume_gateway_url] do
-        nil -> "wss://gateway.discord.gg/?v=10&encoding=json"
+        nil -> "wss://gateway.fluxer.app/?v=10&encoding=json"
         resume_url -> "#{resume_url}?v=10&encoding=json"
       end
 
@@ -66,7 +66,7 @@ defmodule Lanyard.Gateway.Client do
 
   def onconnect(_WSReq, state) do
     if state[:session_id] && state[:resume_gateway_url] && state[:seq_num] do
-      Logger.info("Discord: Resuming session #{state[:session_id]}")
+      Logger.info("Fluxer: Resuming session #{state[:session_id]}")
       resume(state)
     else
       identify(state)
@@ -76,13 +76,13 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def ondisconnect({:remote, :closed}, state) do
-    Logger.warning("Discord: Remote closed connection, will attempt resume")
+    Logger.warning("Fluxer: Remote closed connection, will attempt resume")
 
     if state[:session_id] && state[:resume_gateway_url] do
       seq_num = agent_value(state[:agent_seq_num])
 
       send(
-        :discord_bot,
+        :fluxer_bot,
         {:prepare_resume,
          %{
            session_id: state[:session_id],
@@ -101,7 +101,7 @@ defmodule Lanyard.Gateway.Client do
     # Keeps the sequence tracker process updated
     _update_agent_sequence(data, state)
 
-    # Handle data based on opcode sent by Discord
+    # Handle data based on opcode sent by Fluxer
     _handle_data(data, state)
   end
 
@@ -111,14 +111,14 @@ defmodule Lanyard.Gateway.Client do
     # Keeps the sequence tracker process updated
     _update_agent_sequence(data, state)
 
-    # Handle data based on opcode sent by Discord
+    # Handle data based on opcode sent by Fluxer
     _handle_data(data, state)
   end
 
   defp _handle_data(%{op: :hello} = data, state) do
-    # Discord sends hello op immediately after connection
+    # Fluxer sends hello op immediately after connection
     # Start sending heartbeat with interval defined by the hello packet
-    Logger.debug("Discord: Hello")
+    Logger.debug("Fluxer: Hello")
 
     {:ok, heartbeat_pid} =
       Heartbeat.start_link(
@@ -131,9 +131,9 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp _handle_data(%{op: :heartbeat_ack} = _data, state) do
-    # Discord sends heartbeat_ack after we send a heartbeat
+    # Fluxer sends heartbeat_ack after we send a heartbeat
     # If ack is not received, the connection is stale
-    Logger.debug("Discord: Heartbeat ACK")
+    Logger.debug("Fluxer: Heartbeat ACK")
     Heartbeat.ack(state[:heartbeat_pid])
     {:ok, state}
   end
@@ -153,12 +153,12 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp _handle_data(%{op: :reconnect} = _data, state) do
-    Logger.warning("Discord enforced Reconnect, will resume session")
+    Logger.warning("Fluxer enforced Reconnect, will resume session")
 
     seq_num = agent_value(state[:agent_seq_num])
 
     send(
-      :discord_bot,
+      :fluxer_bot,
       {:prepare_resume,
        %{
          session_id: state[:session_id],
@@ -171,8 +171,8 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp _handle_data(%{op: :invalid_session} = _data, state) do
-    Logger.warning("Discord: Invalid session, starting new session")
-    send(:discord_bot, :clear_resume)
+    Logger.warning("Fluxer: Invalid session, starting new session")
+    send(:fluxer_bot, :clear_resume)
     {:close, "Invalid session, starting new session", state}
   end
 
@@ -204,12 +204,12 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def websocket_info(:heartbeat_stale, _connection, state) do
-    Logger.warning("Discord: Heartbeat stale, will resume session")
+    Logger.warning("Fluxer: Heartbeat stale, will resume session")
 
     seq_num = agent_value(state[:agent_seq_num])
 
     send(
-      :discord_bot,
+      :fluxer_bot,
       {:prepare_resume,
        %{
          session_id: state[:session_id],
@@ -241,7 +241,7 @@ defmodule Lanyard.Gateway.Client do
       |> Map.put(:session_id, payload.data["session_id"])
       |> Map.put(:resume_gateway_url, payload.data["resume_gateway_url"])
 
-    Logger.info("Discord: Ready")
+    Logger.info("Fluxer: Ready")
 
     {:ok, new_state}
   end
@@ -249,7 +249,7 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:message_create, payload}, state) do
     if Application.get_env(:lanyard, :is_idempotent) do
       Task.start(fn ->
-        Lanyard.DiscordBot.CommandHandler.handle_message(payload)
+        Lanyard.FluxerBot.CommandHandler.handle_message(payload)
       end)
     end
 
@@ -278,7 +278,7 @@ defmodule Lanyard.Gateway.Client do
 
     with {:ok, pid} <-
            GenRegistry.lookup(Lanyard.Presence, payload.data["user"]["id"]) do
-      GenServer.cast(pid, {:sync, %{discord_presence: payload.data}})
+      GenServer.cast(pid, {:sync, %{fluxer_presence: payload.data}})
     end
 
     {:ok, state}
@@ -307,7 +307,7 @@ defmodule Lanyard.Gateway.Client do
 
     with {:ok, pid} <-
            GenRegistry.lookup(Lanyard.Presence, payload.data["user"]["id"]) do
-      GenServer.cast(pid, {:sync, %{discord_user: payload.data["user"]}})
+      GenServer.cast(pid, {:sync, %{fluxer_user: payload.data["user"]}})
     end
 
     {:ok, state}
@@ -395,8 +395,8 @@ defmodule Lanyard.Gateway.Client do
 
         gen_init = %{
           user_id: member["user"]["id"],
-          discord_presence: presence,
-          discord_user: member["user"]
+          fluxer_presence: presence,
+          fluxer_user: member["user"]
         }
 
         {:ok, pid} = GenRegistry.lookup_or_start(Lanyard.Presence, gen_init.user_id, [gen_init])

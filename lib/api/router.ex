@@ -2,7 +2,7 @@ defmodule Lanyard.Api.Router do
   import Plug.Conn
 
   alias Lanyard.Api.Routes.V1
-  alias Lanyard.Api.Routes.Discord
+  alias Lanyard.Api.Routes.Fluxer
   alias Lanyard.Api.Routes.Metrics
   alias Lanyard.Api.Util
   alias Lanyard.Api.Quicklinks
@@ -43,9 +43,9 @@ defmodule Lanyard.Api.Router do
   get "/" do
     response = %{
       info:
-        "Lanyard provides Discord presences as an API and WebSocket. Find out more here: https://github.com/Phineas/lanyard",
+        "Lanyard provides Fluxer presences as an API and WebSocket. Find out more here: https://github.com/Phineas/lanyard",
       monitored_user_count: GenRegistry.count(Lanyard.Presence),
-      discord_invite: "https://discord.gg/lanyard"
+      fluxer_invite: "https://fluxer.gg/invite/lanyard"
     }
 
     Util.respond(conn, {:ok, response})
@@ -71,7 +71,7 @@ defmodule Lanyard.Api.Router do
   end
 
   forward("/v1", to: V1)
-  forward("/discord", to: Discord)
+  forward("/fluxer", to: Fluxer)
   forward("/metrics", to: Metrics)
 
   get _ do
@@ -79,7 +79,7 @@ defmodule Lanyard.Api.Router do
 
     cond do
       Enum.member?(@supported_quicktypes, quicktype) ->
-        Quicklinks.DiscordCdn.proxy_image(conn)
+      Quicklinks.FluxerCdn.proxy_image(conn)
 
       true ->
         Util.not_found(conn)

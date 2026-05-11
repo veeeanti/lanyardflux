@@ -1,14 +1,16 @@
 <img src="https://storage.googleapis.com/lanyard/static/lanyardtemplogo.png" alt="Lanyard Logo" width="300"/>
 
-# 🏷️ Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
+# 🏷️ Fluxer Edition - Expose your Fluxer presence and activities to a RESTful API and WebSocket
 
-Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website. It also acts as a globally-accessible realtime KV store which you can update from the Lanyard Discord bot or from the Lanyard API.
+**Note:** This is a modified version of Lanyard adapted for Fluxer, an open-source Discord alternative. For the original Discord version, see [Phineas/lanyard](https://github.com/Phineas/lanyard).
+
+Lanyard is a service that makes it super easy to export your live Fluxer presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, display what you're listening to on Spotify on your personal website. It also acts as a globally-accessible realtime KV store which you can update from the Lanyard Fluxer bot or from the Lanyard API.
 
 You can use Lanyard's API without deploying anything yourself - but if you want to self host it, you have the option to, though it'll require a tiny bit of configuration.
 
 ## Get started in < 10 seconds
 
-Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence will start showing up when you `GET api.lanyard.rest/v1/users/:your_id`. It's that easy.
+Join a Fluxer server with the Lanyard bot and your presence will start showing up when you `GET api.lanyard.rest/v1/users/:your_id`. It's that easy.
 
 ## Table of Contents
 

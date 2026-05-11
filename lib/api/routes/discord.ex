@@ -1,4 +1,4 @@
-defmodule Lanyard.Api.Routes.Discord do
+defmodule Lanyard.Api.Routes.Fluxer do
   alias Lanyard.Api.Util
 
   use Plug.Router
@@ -6,7 +6,7 @@ defmodule Lanyard.Api.Routes.Discord do
   plug(:dispatch)
 
   get "/" do
-    # Discord invite URL
-    Util.redirect(conn, "https://discord.gg/WScAm7vNGF")
+    # Fluxer invite URL
+    Util.redirect(conn, "https://fluxer.gg/invite/lanyard")
   end
 end

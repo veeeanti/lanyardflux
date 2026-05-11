@@ -1,4 +1,4 @@
-defmodule Lanyard.DiscordBot do
+defmodule Lanyard.FluxerBot do
   use GenServer
 
   require Logger
@@ -10,7 +10,7 @@ defmodule Lanyard.DiscordBot do
             resume_data: nil
 
   def start_link(state) do
-    GenServer.start_link(__MODULE__, state, name: :discord_bot)
+    GenServer.start_link(__MODULE__, state, name: :fluxer_bot)
   end
 
   def init(state) do
@@ -29,7 +29,7 @@ defmodule Lanyard.DiscordBot do
     {_, pid} = Gateway.Client.start_link(gateway_state)
     Process.monitor(pid)
 
-    Logger.info("Discord bot running on #{inspect(pid)}")
+    Logger.info("Fluxer bot running on #{inspect(pid)}")
 
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_monitored_users, 0)
 
@@ -45,7 +45,7 @@ defmodule Lanyard.DiscordBot do
   end
 
   def handle_info({:DOWN, _ref, :process, _pid, reason}, state) do
-    Logger.warning("Discord bot crashed with reason: #{reason}. Restarting.")
+    Logger.warning("Fluxer bot crashed with reason: #{reason}. Restarting.")
 
     {:noreply, state, {:continue, :setup_bot}}
   end
