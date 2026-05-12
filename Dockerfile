@@ -34,6 +34,6 @@ COPY --from=build /app/_build/prod/rel/lanyard /opt/lanyard
 EXPOSE 4001
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost:4001/ || exit 1
+  CMD wget -qO- https://fluxyard.vee-anti.xyz:4001/ || exit 1
 
 CMD [ "/opt/lanyard/bin/lanyard", "start" ]

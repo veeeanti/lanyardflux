@@ -117,7 +117,7 @@ defmodule Lanyard.Gateway.Client do
   defp _handle_data(%{op: :hello} = data, state) do
     # Fluxer sends hello op immediately after connection
     # Start sending heartbeat with interval defined by the hello packet
-    Logger.debug("Fluxer: Hello")
+    Logger.debug("Fluxer: Hello - heartbeat interval: #{data.data["heartbeat_interval"]}")
 
     {:ok, heartbeat_pid} =
       Heartbeat.start_link(
@@ -127,6 +127,12 @@ defmodule Lanyard.Gateway.Client do
       )
 
     {:ok, %{state | heartbeat_pid: heartbeat_pid}}
+  end
+
+  defp _handle_data(%{op: :invalid_session} = data, state) do
+    Logger.warning("Fluxer: Invalid session received: #{inspect(data)}")
+    send(:fluxer_bot, :clear_resume)
+    {:close, "Invalid session", state}
   end
 
   defp _handle_data(%{op: :heartbeat_ack} = _data, state) do
