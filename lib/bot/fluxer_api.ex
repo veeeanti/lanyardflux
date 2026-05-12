@@ -1,5 +1,5 @@
 defmodule Lanyard.FluxerBot.FluxerApi do
-  @api_host "https://web.fluxer.app/api"
+  @api_host "https://api.fluxer.app/v1"
 
   def send_message(channel_id, content) when is_binary(content) do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_fluxer_messages_sent)
@@ -16,7 +16,7 @@ defmodule Lanyard.FluxerBot.FluxerApi do
         {"Content-Type", "application/json"}
       ],
       Jason.encode!(%{content: sanitized_content})
-    )
+    ) 
     |> Finch.request(Lanyard.Finch)
   end
 
