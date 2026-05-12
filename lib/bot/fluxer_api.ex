@@ -15,7 +15,7 @@ defmodule Lanyard.FluxerBot.FluxerApi do
         {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)},
         {"Content-Type", "application/json"}
       ],
-      Jason.encode!(%{"recipient_id": recipients.id})
+      Jason.encode!(%{"recipient_id": recipient})
     )
     |> Finch.request(Lanyard.Finch)
   end
