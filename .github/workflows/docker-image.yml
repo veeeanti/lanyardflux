@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: docker login
         env:
           DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
@@ -19,6 +19,6 @@ jobs:
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag phineas/lanyard:latest
+        run: docker build . --file Dockerfile --tag veeeanti/lanyardflux:latest
       - name: Docker Push
-        run: docker push phineas/lanyard
+        run: docker push veeeanti/lanyardflux
