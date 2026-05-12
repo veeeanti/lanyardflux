@@ -1,4 +1,4 @@
-FROM elixir:1.19-alpine AS build
+FROM hexpm/elixir:1.19.5-erlang-27.3.3.1-alpine-3.19 AS build
 
 RUN apk add --no-cache git build-base
 
@@ -20,9 +20,11 @@ RUN \
 	mix compile && \
 	mix release
 
-FROM alpine:3.20
+# Runtime stage - use the same base for library compatibility
+FROM hexpm/elixir:1.19.5-erlang-27.3.3.1-alpine-3.19
 
-RUN apk add --no-cache openssl libstdc++ curl
+# Remove build dependencies
+RUN apk del build-base git
 
 WORKDIR /app
 
@@ -31,6 +33,6 @@ COPY --from=build /app/_build/prod/rel/lanyard /opt/lanyard
 EXPOSE 4001
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:4001/ || exit 1
+  CMD wget -qO- http://localhost:4001/ || exit 1
 
 CMD [ "/opt/lanyard/bin/lanyard", "start" ]
