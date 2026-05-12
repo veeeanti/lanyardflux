@@ -227,10 +227,12 @@ defmodule Lanyard.Gateway.Client do
     Logger.info("Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
     Logger.info("Killing seq_num process!")
     Process.exit(state[:agent_seq_num], :kill)
-    Logger.info("Killing rest_client process!")
-    Process.exit(state[:rest_client], :kill)
     Logger.info("Killing heartbeat process!")
-    Process.exit(state[:heartbeat_pid], :kill)
+    
+    if state[:heartbeat_pid] do
+      Process.exit(state[:heartbeat_pid], :kill)
+    end
+    
     :ok
   end
 
