@@ -6,24 +6,17 @@ end
 defmodule Lanyard.Presence.PrettyPresence do
   @derive Jason.Encoder
   defstruct fluxer_user: %{},
-            fluxer_status: "offline",
-            active_on_fluxer_web: false,
-            active_on_fluxer_desktop: false,
-            active_on_fluxer_mobile: false,
-            active_on_fluxer_embedded: false,
-            active_on_fluxer_vr: false,
-            listening_to_spotify: false,
-            spotify: nil,
-            activities: [],
-            kv: %{}
+             fluxer_status: "offline",
+             active_on_fluxer_mobile: false,
+             afk: false,
+             custom_status: nil,
+             kv: %{}
 end
 
 defmodule Lanyard.Presence do
   use GenServer
 
   alias Lanyard.Connectivity.Redis
-  alias Lanyard.Presence.Spotify
-  alias Lanyard.Presence.Activity
 
   @derive Jason.Encoder
   defstruct user_id: nil,
@@ -188,32 +181,16 @@ defmodule Lanyard.Presence do
   end
 
   def build_pretty_presence(raw_data) do
-    activities = raw_data.fluxer_presence["activities"] || []
-
-    spotify_activity =
-      activities
-      |> Enum.find(fn activity ->
-        activity["id"] == Application.get_env(:lanyard, :fluxer_spotify_activity_id)
-      end)
-
     has_presence? = raw_data.fluxer_presence !== nil
 
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
           fluxer_user: raw_data.fluxer_user,
-          fluxer_status: raw_data.fluxer_presence["status"],
-          active_on_fluxer_web: Map.has_key?(raw_data.fluxer_presence["client_status"], "web"),
-          active_on_fluxer_desktop:
-            Map.has_key?(raw_data.fluxer_presence["client_status"], "desktop"),
-          active_on_fluxer_mobile:
-            Map.has_key?(raw_data.fluxer_presence["client_status"], "mobile"),
-          active_on_fluxer_embedded:
-            Map.has_key?(raw_data.fluxer_presence["client_status"], "embedded"),
-          active_on_fluxer_vr: Map.has_key?(raw_data.fluxer_presence["client_status"], "vr"),
-          listening_to_spotify: spotify_activity !== nil,
-          spotify: Spotify.build_pretty_spotify(spotify_activity),
-          activities: Activity.build_pretty_activities(raw_data.fluxer_presence["activities"]),
+          fluxer_status: raw_data.fluxer_presence["status"] || "offline",
+          active_on_fluxer_mobile: raw_data.fluxer_presence["mobile"] || false,
+          afk: raw_data.fluxer_presence["afk"] || false,
+          custom_status: raw_data.fluxer_presence["custom_status"],
           kv: raw_data.kv
         }
       else

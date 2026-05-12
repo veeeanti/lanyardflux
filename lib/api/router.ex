@@ -45,7 +45,7 @@ defmodule Lanyard.Api.Router do
       info:
         "Lanyard provides Fluxer presences as an API and WebSocket. Find out more here: https://github.com/Phineas/lanyard",
       monitored_user_count: GenRegistry.count(Lanyard.Presence),
-      fluxer_invite: "https://fluxer.gg/invite/lanyard"
+      fluxer_invite: "https://fluxer.gg/VEQH9Spf"
     }
 
     Util.respond(conn, {:ok, response})

@@ -42,7 +42,7 @@ defmodule Lanyard.Gateway.Client do
     url =
       case state[:resume_gateway_url] do
         nil -> "wss://gateway.fluxer.app/?v=1&encoding=json"
-        resume_url -> "#{resume_url}?v=10&encoding=json"
+        resume_url -> "#{resume_url}?v=1&encoding=json"
       end
 
     :websocket_client.start_link(url, __MODULE__, [state])
@@ -283,9 +283,19 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:presence_update, payload}, state) do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_presence_updates)
 
+    # Fluxer presence format: {user, status, mobile, afk, custom_status}
+    # Convert to our internal format
+    fluxer_presence = %{
+      "user" => payload.data["user"],
+      "status" => payload.data["status"],
+      "mobile" => payload.data["mobile"] || false,
+      "afk" => payload.data["afk"] || false,
+      "custom_status" => payload.data["custom_status"]
+    }
+
     with {:ok, pid} <-
            GenRegistry.lookup(Lanyard.Presence, payload.data["user"]["id"]) do
-      GenServer.cast(pid, {:sync, %{fluxer_presence: payload.data}})
+      GenServer.cast(pid, {:sync, %{fluxer_presence: fluxer_presence}})
     end
 
     {:ok, state}
@@ -400,9 +410,22 @@ defmodule Lanyard.Gateway.Client do
           payload.data["presences"]
           |> Enum.find(fn presence -> presence["user"]["id"] === member["user"]["id"] end)
 
+        # Convert Fluxer presence format to internal format
+        fluxer_presence = if presence do
+          %{
+            "user" => presence["user"],
+            "status" => presence["status"],
+            "mobile" => presence["mobile"] || false,
+            "afk" => presence["afk"] || false,
+            "custom_status" => presence["custom_status"]
+          }
+        else
+          nil
+        end
+
         gen_init = %{
           user_id: member["user"]["id"],
-          fluxer_presence: presence,
+          fluxer_presence: fluxer_presence,
           fluxer_user: member["user"]
         }
 
