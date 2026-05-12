@@ -1,5 +1,4 @@
 defmodule Lanyard.Gateway.Client do
-  # a lot of functionality here is taken from: https://github.com/rmcafee/fluxer_ex/blob/master/lib/fluxer_ex/client/client.ex
   require Logger
 
   alias Lanyard.Gateway.Heartbeat
@@ -42,7 +41,7 @@ defmodule Lanyard.Gateway.Client do
 
     url =
       case state[:resume_gateway_url] do
-        nil -> "wss://gateway.fluxer.app/?v=10&encoding=json"
+        nil -> "wss://gateway.fluxer.app/?v=1&encoding=json"
         resume_url -> "#{resume_url}?v=10&encoding=json"
       end
 

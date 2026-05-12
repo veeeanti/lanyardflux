@@ -6,7 +6,7 @@ defmodule Lanyard.Api.Routes.Fluxer do
   plug(:dispatch)
 
   get "/" do
-    # Fluxer invite URL
-    Util.redirect(conn, "https://fluxer.gg/invite/lanyard")
+    # Fluxyard invite URL
+    Util.redirect(conn, "https://fluxer.gg/VEQH9Spf")
   end
 end
