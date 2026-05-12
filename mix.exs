@@ -7,20 +7,14 @@ defmodule Lanyard.MixProject do
       version: "0.1.0",
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
-      releases: [
-        lanyard: [
-          include_executables_for: [:unix],
-          applications: [:runtime_tools, :redix]
-        ]
-      ]
+      deps: deps()
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :corsica],
+      extra_applications: [:logger, :corsica, :runtime_tools, :redix],
       mod: {Lanyard, []}
     ]
   end

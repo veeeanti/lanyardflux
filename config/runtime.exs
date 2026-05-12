@@ -10,5 +10,5 @@ if config_env() == :prod do
     bot_token: System.get_env("BOT_TOKEN"),
     redis_uri:
       System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL"),
-    is_idempotent: Lanyard.is_idempotent?()
+    is_idempotent: true
 end
