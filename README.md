@@ -303,60 +303,82 @@ Where `id` is the Discord user ID. `file_type` can be one of: `png`, `gif`, `web
 
 ## Self-host with Docker
 
+### Using docker-compose (Recommended)
+
+The easiest way to self-host is using the provided `docker-compose.yml`:
+
+```bash
+# Copy the example environment file and fill in your values
+cp .env.example .env
+# Edit .env with your BOT_TOKEN
+docker-compose up -d
+```
+
+### Manual Docker Build
+
 Build the Docker image by cloning this repo and running:
 
 ```bash
-# The latest version is already on the docker hub, you can skip this step unless you would like to run a modified version.
-docker build -t phineas/lanyard:latest .
+docker build -t lanyardflux:latest .
 ```
 
-If you don't already have a redis server you'll need to run one, here's the docker command to run one:
+If you don't already have a redis server you'll need to run one:
 
 ```bash
-docker run -d --name lanyard-redis -v docker_mount_location_on_host:/data redis
+docker run -d --name lanyard-redis -v docker_mount_location_on_host:/data redis:7-alpine
 ```
 
 And run Lanyard API server using:
 
 ```bash
-docker run --rm -it -p 4001:4001 -e REDIS_HOST=redis -e BOT_TOKEN=<token> --link lanyard-redis:redis phineas/lanyard:latest
+docker run --rm -it -p 4001:4001 -e REDIS_URI=redis://host.docker.internal:6379 -e BOT_TOKEN=<token> lanyardflux:latest
 ```
 
-You'll be able to access the API using **port 4001**.
+### Create a Fluxer Bot
 
-You also need to create a Discord bot and use its token above.
+1. Go to [Fluxer Developer Portal](https://fluxer.gg/developers)
+2. Create a new application
+3. Add a bot to the application
+4. Copy the bot token for `BOT_TOKEN`
 
-Create a bot here: https://discord.com/developers/applications
+### Environment Variables
 
-**Make sure you enable** these settings in your bot settings:
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `BOT_TOKEN` | Your Fluxer bot token | Required |
+| `REDIS_URI` | Redis connection string | `redis://localhost:6379` |
+| `PORT` | HTTP port | `4001` |
+| `COMMAND_PREFIX` | Bot command prefix | `.` |
+| `BOT_PRESENCE` | Bot status text | `you <3` |
+| `BOT_PRESENCE_TYPE` | Status type (0-4) | `3` |
 
-- Privileged Gateway Intents > **PRESENCE INTENT**
-- Privileged Gateway Intents > **SERVER MEMBERS INTENT**
+### Dokploy Deployment
 
-If you'd like to run Lanyard with `docker-compose`, here's an example:
+#### Option 1: Docker Compose (Recommended)
+1. Create a new application in Dokploy
+2. Connect your Git repository
+3. Select "Docker Compose" as deployment method
+4. Set the compose file path to `docker-compose.yml`
+5. Add environment variables in the Dokploy UI:
+   - `BOT_TOKEN` - Your Fluxer bot token
+6. Deploy
 
-```yml
-version: "3.8"
+#### Option 2: GitHub Only (Dockerfile)
+If you can only use GitHub without Docker Compose:
+1. Create a new application in Dokploy
+2. Connect your Git repository
+3. Select "Dockerfile" as deployment method
+4. You'll need an external Redis instance. Options:
+   - Use Dokploy's built-in Redis service
+   - Use a managed Redis (Redis Labs, Upstash, etc.)
+   - Set `REDIS_URI` to your Redis connection string
+5. Add environment variables:
+   - `BOT_TOKEN` - Your Fluxer bot token
+   - `REDIS_URI` - Your Redis connection string (e.g., `redis://localhost:6379`)
+   - `PORT` - `4001`
+6. Deploy
 
-services:
-  redis:
-    image: redis
-    restart: always
-    container_name: lanyard_redis
-  lanyard:
-    image: phineas/lanyard:latest
-    restart: always
-    container_name: lanyard
-    depends_on:
-      - redis
-    ports:
-      - 4001:4001
-    environment:
-      BOT_TOKEN: <token>
-      REDIS_HOST: redis
-```
-
-Note, that you're **hosting a http server, not https**. You'll need to use a **reverse proxy** such as [traefik](https://traefik.io/traefik/) if you want to secure your API endpoint.
+Note: You're **hosting a http server, not https**. Use a reverse proxy like Caddy or Nginx for HTTPS.
 
 ## Showcase
 
