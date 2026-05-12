@@ -1,4 +1,4 @@
-FROM hexpm/elixir:1.19.5-erlang-27.3.3.1-alpine-3.19 AS build
+FROM elixir:1.19-alpine AS build
 
 RUN apk add --no-cache git build-base
 
@@ -21,10 +21,11 @@ RUN \
 	mix release
 
 # Runtime stage - use the same base for library compatibility
-FROM hexpm/elixir:1.19.5-erlang-27.3.3.1-alpine-3.19
+FROM elixir:1.19-alpine
 
-# Remove build dependencies
-RUN apk del build-base git
+# Remove build dependencies and add wget for healthcheck
+RUN apk del build-base git && \
+    apk add --no-cache wget
 
 WORKDIR /app
 
